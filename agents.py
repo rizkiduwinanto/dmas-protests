@@ -24,7 +24,7 @@ def event(tick):
 #close friends 4
 #friends 10
 #network 30
-agents = np.array([])
+agents = np.array([agent(0)])
 base_disstatisfaction = 20
 for i in range(100):
     random_number = rnd.randint(0,base_disstatisfaction)
