@@ -1,18 +1,18 @@
 import numpy as np
 import random as rnd
 class agent:
-    close_friends = np.array([])
-    friends = np.array([])
-    network = np.array([])
-    dissatisfaction = 0
-    def __init__(self, dissatisfaction):
+    def __init__(self, dissatisfaction,id):
         self.dissatisfaction = dissatisfaction 
-    def add_close_friend(close_friend):
-        np.append(close_friends,close_friend)
-    def add_friend(friend):
-        np.append(friends,friend)
-    def add_to_network(network_friend):
-        np.append(network,network_friend)
+        self.close_friends = np.array([])
+        self.friends = np.array([])
+        self.network = np.array([])
+        self.id = id
+    def add_close_friend(self,close_friend):
+        self.close_friends = np.append(self.close_friends,close_friend)
+    def add_friend(self,friend):
+        self.friends = np.append(self.friends,friend)
+    def add_to_network(self,network_friend):
+        self.network = np.append(self.network,network_friend)
 
 def event(tick):
     if tick%7 == 0 :
@@ -24,23 +24,28 @@ def event(tick):
 #close friends 4
 #friends 10
 #network 30
-agents = np.array([agent(0)])
+agents = np.array([])
 base_disstatisfaction = 20
 for i in range(100):
-    random_number = rnd.randint(0,base_disstatisfaction)
-    x = agent(random_number)
-    np.append(agents, x)
+    agents = np.append(agents, agent(rnd.randint(0,base_disstatisfaction),i))
 
 for i in range(25):
     close_friendgroup = np.array([agents[0+i*4],agents[1+i*4],agents[2+i*4],agents[3+i*4]])
-    agents[0+i*4].add_close_friend(close_friendgroup)
+    agents[(0+i*4)].add_close_friend(np.array([agents[1+i*4],agents[2+i*4],agents[3+i*4]]))
+    agents[(1+i*4)].add_close_friend(np.array([agents[0+i*4],agents[2+i*4],agents[3+i*4]]))
+    agents[(2+i*4)].add_close_friend(np.array([agents[0+i*4],agents[1+i*4],agents[3+i*4]]))
+    agents[(3+i*4)].add_close_friend(np.array([agents[0+i*4],agents[1+i*4],agents[2+i*4]]))
 
 for i in range(100):
     j=0
     while len(agents[j].friends) != 10:
-        current_agent = agents[randint(0,100)]
+        current_agent = agents[rnd.randint(0,99)]
         if not(np.any(agents[i].close_friends == current_agent)) and not(np.any(agents[i].friends == current_agent)):
-            np.append(agents[j].friends,current_agent)
-        
+            agents[j].friends = np.append(agents[j].friends,current_agent)
+    while len(agents[j].network) != 30:
+        current_agent = agents[rnd.randint(0,99)]
+        if not(np.any(agents[i].close_friends == current_agent)) and not(np.any(agents[i].friends == current_agent) and not(np.any(agents[i].network == current_agent))):
+            agents[j].network = np.append(agents[j].network,current_agent)
+print(agents)
 
 
