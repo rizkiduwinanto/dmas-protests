@@ -1,5 +1,6 @@
 import numpy as np
 import random as rnd
+
 class agent:
     def __init__(self, dissatisfaction,id):
         self.dissatisfaction = dissatisfaction 
@@ -41,13 +42,18 @@ class agent:
     
 
 
+#how much each connection is affected per person
+close_friends_af = 0.8
+friends_af = 0.5
+netwrok_af = 0.1
 def event(tick):
     if tick%7 == 0 :
-        return (random.randint(-5, 5))
+        return (rnd.randint(-7, 7)*np.array([close_friends_af,friends_af,netwrok_af]))
     if tick%30 == 0 :
-        return (random.randint(-30, 30))
+        return (rnd.randint(-30, 30)*np.array([close_friends_af,friends_af,netwrok_af]))
     if tick%90 == 0 :
-        return (random.randint(-100, 100))
+        return (rnd.randint(-90, 90)*np.array([close_friends_af,friends_af,netwrok_af]))
+
 #close friends 4
 #friends 10
 #network 30
