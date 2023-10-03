@@ -70,16 +70,15 @@ for i in range(25):
     agents[(3+i*4)].add_close_friend(np.array([agents[0+i*4],agents[1+i*4],agents[2+i*4]]))
 
 for i in range(100):
-    j=0
-    while len(agents[j].friends) != 10:
+    while len(agents[i].friends) != 10:
         current_agent = agents[rnd.randint(0,99)]
         if not(np.any(agents[i].close_friends == current_agent)) and not(np.any(agents[i].friends == current_agent)):
-            agents[j].friends = np.append(agents[j].friends,current_agent)
-    while len(agents[j].network) != 30:
+            agents[i].friends = np.append(agents[i].friends,current_agent)
+    while len(agents[i].network) != 30:
         current_agent = agents[rnd.randint(0,99)]
         if not(np.any(agents[i].close_friends == current_agent)) and not(np.any(agents[i].friends == current_agent) and not(np.any(agents[i].network == current_agent))):
-            agents[j].network = np.append(agents[j].network,current_agent)
-# print(agents)
+            agents[i].network = np.append(agents[i].network,current_agent)
+print(agents)
 def average_total_dissatisfaction(agents):
     average = 0
     for i in range(len(agents)):
@@ -102,5 +101,5 @@ agents[0].update_dissatisfaction()
 print("New dissatisfaction: ",agents[0].get_dissatisfaction() )
 # run(agents)
 for i in range(len(agents)):
-    print(len(agents[i].network))
+    print(len(agents[i].friends))
 
