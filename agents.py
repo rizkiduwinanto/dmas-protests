@@ -1,5 +1,6 @@
 import numpy as np
 import random as rnd
+import matplotlib.pyplot as plt
 
 class agent:
     def __init__(self, dissatisfaction,id):
@@ -32,20 +33,33 @@ class agent:
         for i in range(len(self.network)):
             average_friend_dis += self.network[i].get_dissatisfaction()
         return average_friend_dis / len(self.network)
+    
+
+    # Compute how different the dissatisfaction between the agent and all its network is
     def dissatisfaction_distance(self):
-        weighted_average = (4*self.close_friends_dissatisfaction() + 2*self.friends_dissatisfaction() + self.network_dissatisfaction()) / 7
+        weighted_average = (close_friends_af*self.close_friends_dissatisfaction() + friends_af*self.friends_dissatisfaction() + netwrok_af*self.network_dissatisfaction()) / (close_friends_af + friends_af+netwrok_af)
         return weighted_average - self.dissatisfaction
+    
+    # Change the agent's dissatisfaction based on how different it's friends dissatisfaction is
     def update_dissatisfaction(self):
-        change = self.dissatisfaction_distance() * 0.05
+        change = self.dissatisfaction_distance() * (1 / base_disstatisfaction)
         self.dissatisfaction *= (1 + change)
+
+        # Just to see:  give a 1/1000 possibility that one agent becomes wild, maximum dissatisfaction
+        if rnd.randint(0,1000) <=5:
+            if self.dissatisfaction != base_disstatisfaction:
+                self.dissatisfaction = base_disstatisfaction
+        if rnd.randint(0,10000) <= 1:
+            if self.dissatisfaction != 0:
+                self.dissatisfaction = 0
 
     
 
 
 #how much each connection is affected per person
-close_friends_af = 0.8
-friends_af = 0.5
-netwrok_af = 0.1
+close_friends_af = 0.6
+friends_af = 0
+netwrok_af = 0
 def event(tick):
     if tick%7 == 0 :
         return (rnd.randint(-7, 7)*np.array([close_friends_af,friends_af,netwrok_af]))
@@ -58,7 +72,7 @@ def event(tick):
 #friends 10
 #network 30
 agents = np.array([])
-base_disstatisfaction = 20
+base_disstatisfaction = 100
 for i in range(100):
     agents = np.append(agents, agent(rnd.randint(0,base_disstatisfaction),i))
 
@@ -78,7 +92,7 @@ for i in range(100):
         current_agent = agents[rnd.randint(0,99)]
         if not(np.any(agents[i].close_friends == current_agent)) and not(np.any(agents[i].friends == current_agent) and not(np.any(agents[i].network == current_agent))):
             agents[i].network = np.append(agents[i].network,current_agent)
-print(agents)
+
 def average_total_dissatisfaction(agents):
     average = 0
     for i in range(len(agents)):
@@ -86,20 +100,29 @@ def average_total_dissatisfaction(agents):
     return average / len(agents)
 
 dissatisfaction = []
+a_dis = []
 def run(agents):
-    iterations = 200
+    iterations = 3000
+
+
     for j in range(iterations):
+        dissatisfaction.append(average_total_dissatisfaction(agents))
+
+        # Iterate over the full array of agents and change their dissatisfaction based on their friends'
         for i in range(len(agents)):
             agents[i].update_dissatisfaction()
-        np.append(dissatisfaction, average_total_dissatisfaction(agents))
+        
 
-print("Close friends average dissatisfaction: ",agents[0].close_friends_dissatisfaction())
-print("Friends average dissatisfaction: ",agents[0].friends_dissatisfaction())
-print("Network average dissatisfaction: ",agents[0].network_dissatisfaction())
-print("Agent has a dissatisfaction of {0} and a difference of {1}".format(agents[0].get_dissatisfaction(), agents[0].dissatisfaction_distance()))
-agents[0].update_dissatisfaction()
-print("New dissatisfaction: ",agents[0].get_dissatisfaction() )
-# run(agents)
-for i in range(len(agents)):
-    print(len(agents[i].friends))
+# print("Close friends average dissatisfaction: ",agents[0].close_friends_dissatisfaction())
+# print("Friends average dissatisfaction: ",agents[0].friends_dissatisfaction())
+# print("Network average dissatisfaction: ",agents[0].network_dissatisfaction())
+run(agents)
+# print("Agent has a dissatisfaction of {0} and a difference of {1}".format(agents[0].get_dissatisfaction(), agents[0].dissatisfaction_distance()))
+# agents[0].update_dissatisfaction()
+# print("New dissatisfaction: ",agents[0].get_dissatisfaction() )
+
+plt.plot(dissatisfaction)
+plt.xlabel("Number of Iterations")
+plt.ylabel("Average Dissatisfaction")
+plt.show()
 
