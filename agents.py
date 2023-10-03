@@ -74,15 +74,19 @@ for i in range(100):
         if not(np.any(agents[i].close_friends == current_agent)) and not(np.any(agents[i].friends == current_agent) and not(np.any(agents[i].network == current_agent))):
             agents[j].network = np.append(agents[j].network,current_agent)
 # print(agents)
+def average_total_dissatisfaction(agents):
+    average = 0
+    for i in range(len(agents)):
+        average += agents[i].get_dissatisfaction()
+    return average / len(agents)
 
-# def run(agents):
-#     iterations = 200
-#     for j in range(iterations):
-#         for i in range(len(agents)):
-
-
-
-
+dissatisfaction = []
+def run(agents):
+    iterations = 200
+    for j in range(iterations):
+        for i in range(len(agents)):
+            agents[i].update_dissatisfaction()
+        np.append(dissatisfaction, average_total_dissatisfaction(agents))
 
 print("Close friends average dissatisfaction: ",agents[0].close_friends_dissatisfaction())
 print("Friends average dissatisfaction: ",agents[0].friends_dissatisfaction())
@@ -90,4 +94,7 @@ print("Network average dissatisfaction: ",agents[0].network_dissatisfaction())
 print("Agent has a dissatisfaction of {0} and a difference of {1}".format(agents[0].get_dissatisfaction(), agents[0].dissatisfaction_distance()))
 agents[0].update_dissatisfaction()
 print("New dissatisfaction: ",agents[0].get_dissatisfaction() )
+# run(agents)
+for i in range(len(agents)):
+    print(len(agents[i].network))
 
