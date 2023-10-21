@@ -89,10 +89,11 @@ for i in range(25):
     agents[(3+i*4)].add_close_friend(np.array([agents[0+i*4],agents[1+i*4],agents[2+i*4]]))
 
 for i in range(100):
-    while len(agents[i].friends) != 10:
-        current_agent = agents[rnd.randint(0,99)]
-        if not(np.any(agents[i].close_friends == current_agent)) and not(np.any(agents[i].friends == current_agent)):
-            agents[i].friends = np.append(agents[i].friends,current_agent)
+    while len(agents[i].friends) <= 10:
+        rnumber = rnd.randint(0,99)
+        if not(np.any(agents[i].close_friends == agents[rnumber])) and not(np.any(agents[i].friends == agents[rnumber])):
+            agents[i].friends = np.append(agents[i].friends,agents[rnumber])
+            agents[rnumber].friends = np.append(agents[rnumber],agents[i].friends)
     while len(agents[i].network) != 30:
         current_agent = agents[rnd.randint(0,99)]
         if not(np.any(agents[i].close_friends == current_agent)) and not(np.any(agents[i].friends == current_agent) and not(np.any(agents[i].network == current_agent))):
