@@ -17,6 +17,16 @@ class agent:
         return self.personal_dissatisfaction
     def get_affected_dissatisfaction(self):
         return self.affected_dissatisfaction
+    
+    def get_close_friends(self):
+        return self.close_friends
+    def get_friends(self):
+        return self.friends
+    def get_network(self):
+        return self.network
+
+    def event_update_affected_dissatisfaction(self,amount):
+        self.affected_dissatisfaction += amount
 
     def add_close_friend(self,close_friend):
         self.close_friends = np.append(self.close_friends,close_friend)
@@ -62,16 +72,19 @@ class agent:
 
 
 #how much each connection is affected per person
-close_friends_af = -10
-friends_af = -1
-netwrok_af = 0
+person = 10
+close_friends_af = 9
+friends_af = 3
+netwrok_af = 1
+public_af = 0.1
 def event(tick):
     if tick%7 == 0 :
-        return (rnd.randint(-7, 7)*np.array([close_friends_af,friends_af,netwrok_af,public_af]))
-    if tick%30 == 0 :
-        return (rnd.randint(-30, 30)*np.array([close_friends_af,friends_af,netwrok_af,public_af]))
-    if tick%90 == 0 :
-        return (rnd.randint(-90, 90)*np.array([close_friends_af,friends_af,netwrok_af,public_af]))
+        return (rnd.randint(-7, 7)*np.array([person,close_friends_af,friends_af,netwrok_af,public_af]))
+    elif tick%29 == 0 :
+        return (rnd.randint(-30, 30)*np.array([person,close_friends_af,friends_af,netwrok_af,public_af]))
+    elif tick%89 == 0 :
+        return (rnd.randint(-90, 90)*np.array([person,close_friends_af,friends_af,netwrok_af,public_af]))
+    else: return np.array([0,0,0,0,0])
 
 #close friends 4
 #friends 10
@@ -117,6 +130,22 @@ def run(agents):
         for i in range(len(agents)):
             agents[i].update_dissatisfaction()
         
+
+        rnumber = rnd.randint(0,99)
+        eve = event(j)
+        agents[rnumber].event_update_affected_dissatisfaction(eve[0])
+        for close_friend in agents[rnumber].get_close_friends():
+            close_friend.event_update_affected_dissatisfaction(eve[1])
+        for friend in agents[rnumber].get_friends():
+            friend.event_update_affected_dissatisfaction(eve[2])
+        for network in agents[rnumber].get_network():
+            network.event_update_affected_dissatisfaction(eve[3])
+        for agent in agents:
+            if agent != agents[rnumber] and not(np.any(agent == agents[rnumber].get_close_friends())) and not(np.any(agent == agents[rnumber].get_friends())) and not(np.any(agent == agents[rnumber].get_network())):
+                agent.event_update_affected_dissatisfaction(eve[4])
+        #if j%7 == 0:
+        #    print(eve)
+        #    print(agents[rnumber])
 
 print("Close friends average dissatisfaction: ",agents[0].close_friends_dissatisfaction())
 print("Friends average dissatisfaction: ",agents[0].friends_dissatisfaction())
