@@ -6,6 +6,7 @@ import math
 # Global variables
 
 # how much each connection is affected per person
+SELV = -30
 CLOSE_FRIENDS_AF = -10
 FRIENDS_AF = -1
 NETWORK_AF = 0
@@ -159,11 +160,32 @@ class Agent:
 
 def event(tick):
     if tick % 7 == 0:
-        return (rnd.randint(-7, 7) * np.array([CLOSE_FRIENDS_AF, FRIENDS_AF, NETWORK_AF, PUBLIC_AF]))
-    if tick % 30 == 0:
-        return (rnd.randint(-30, 30) * np.array([CLOSE_FRIENDS_AF, FRIENDS_AF, NETWORK_AF, PUBLIC_AF]))
-    if tick % 90 == 0:
-        return (rnd.randint(-90, 90) * np.array([CLOSE_FRIENDS_AF, FRIENDS_AF, NETWORK_AF, PUBLIC_AF]))
+        affect = (rnd.randint(-7, 7) * np.array([CLOSE_FRIENDS_AF, FRIENDS_AF, NETWORK_AF, PUBLIC_AF]))
+    if tick % 29 == 0:
+        affect = (rnd.randint(-29, 29) * np.array([CLOSE_FRIENDS_AF, FRIENDS_AF, NETWORK_AF, PUBLIC_AF]))
+    if tick % 89 == 0:
+        affect = (rnd.randint(-89, 89) * np.array([CLOSE_FRIENDS_AF, FRIENDS_AF, NETWORK_AF, PUBLIC_AF]))
+    return affect
+
+def per_group(dissatisfaction):
+    affect = np.array([0,0,0,0,0])
+    if dissatisfaction[0]:
+        affect[0] += (rnd.randint(-30, 30) * SELV)
+    if dissatisfaction[1]:
+        affect[1] += (rnd.randint(-20, 20) * CLOSE_FRIENDS_AF)
+    if dissatisfaction[2]:
+        affect[2] += (rnd.randint(-10, 10) * FRIENDS_AF)
+    if dissatisfaction[3]:
+        affect[3] += (rnd.randint(-5, 5) * NETWORK_AF)
+    if dissatisfaction[4]:
+        affect[4] += (rnd.randint(-1, 1) * PUBLIC_AF)
+    return affect
+
+def BLM(tick,length):
+    return None
+
+
+
 
 
 def create_agents():
@@ -253,8 +275,8 @@ def run_simulation(agents):
     dissatisfaction = []
 
     for j in range(iterations):
-        if iterations%50 == 0 :
-            print(iterations/5000)
+        if j%50 == 0 :
+            print(j/50,"%")
 
         dissatisfaction.append(average_total_dissatisfaction(agents))
 
