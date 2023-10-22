@@ -52,6 +52,16 @@ class Agent:
         :return: Affected dissatisfaction level of the agent.
         """
         return self.affected_dissatisfaction
+    
+    def get_close_friends(self):
+        return self.close_friends
+    def get_friends(self):
+        return self.friends
+    def get_network(self):
+        return self.network
+
+    def event_update_affected_dissatisfaction(self,amount):
+        self.affected_dissatisfaction += amount
 
     def add_close_friend(self, close_friend):
         """
@@ -244,6 +254,7 @@ def run_simulation(agents):
 
     for j in range(iterations):
         dissatisfaction.append(average_total_dissatisfaction(agents))
+
 
         for agent in agents:
             agent.update_dissatisfaction()
