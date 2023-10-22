@@ -9,7 +9,7 @@ import math
 CLOSE_FRIENDS_AF = -10
 FRIENDS_AF = -1
 NETWORK_AF = 0
-PUBLIC_AF = None  # yet to be determined
+PUBLIC_AF = 0  # yet to be determined
 
 # Agent base level of dissatisfaction.
 BASE_DISSATISFACTION = 100
@@ -253,6 +253,9 @@ def run_simulation(agents):
     dissatisfaction = []
 
     for j in range(iterations):
+        if iterations%50 == 0 :
+            print(iterations/5000)
+
         dissatisfaction.append(average_total_dissatisfaction(agents))
 
 
