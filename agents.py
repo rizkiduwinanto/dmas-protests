@@ -54,7 +54,7 @@ class Agent:
         :return: Affected dissatisfaction level of the agent.
         """
         return self.affected_dissatisfaction
-    
+
     def get_close_friends(self):
         return self.close_friends
     def get_friends(self):
@@ -168,12 +168,6 @@ class Agent:
     #     return (rnd.randint(-90, 90) * np.array([CLOSE_FRIENDS_AF, FRIENDS_AF, NETWORK_AF, PUBLIC_AF]))
 
 
-
-    
-    ##  Events for close friends, acquaintances and network ##
-    ## For each of them, a probability that it happens is defined and also ##
-    ## The impact (how big or small the event it). ##
-    ## An impact of 1 maximizes dissatisfaction for that group  ##
 def close_friends_event(agent, impact, probability,j,list):
     if rnd.randint(0, int(1/probability)) <= 1:
         for a in agent.get_close_friends():
@@ -295,34 +289,28 @@ def run_simulation(agents):
     Returns:
     list: A list of dissatisfaction values for each iteration.
     """
-    iterations = 10000
+    iterations = 35000
     probability_close_event = 0.004
 
     dissatisfaction = []
 
     for j in range(iterations):
         dissatisfaction.append(average_total_dissatisfaction(agents))
-        
-        # Implement small close friends events that increase/decrease dissatisfaction and one big close friends event
-        
-        close_friends_event(agents[rnd.randint(0,99)], 0.4, (200/iterations),j,0)
-        close_friends_event(agents[rnd.randint(0,99)], 1, 50/iterations,j,0)
-        close_friends_down_event(agents[rnd.randint(0,99)], 0.4, 200/iterations)
+        close_friends_event(agents[rnd.randint(0,99)], 0.4, 0.008,j,0)
+        close_friends_event(agents[rnd.randint(0,99)], 1, 0.0008,j,1)
+        close_friends_down_event(agents[rnd.randint(0,99)], 0.4,0.008)
 
+        # acquaintances_event(agents[rnd.randint(0,99)], 0.2, 0.004,j,0)
+        # acquaintances_event(agents[rnd.randint(0,99)], 1, 0.0004,j,1)
+        # acquaintances_down_event(agents[rnd.randint(0,99)], 0.2,0.004)
 
-        # Implement small acquaintance events that increase/decrease dissatisfaction and one big acquaintance event
-
-        acquaintances_event(agents[rnd.randint(0,99)], 0.4, 100/iterations,j,0)
-        #acquaintances_event(agents[rnd.randint(0,99)], 1, 2/iterations,j,1)
-        acquaintances_down_event(agents[rnd.randint(0,99)], 0.4,100/iterations)
-
-        #network_event(agents[rnd.randint(0,99)], 1, 1/iterations,j,1)
-        #network_down_event(agents[rnd.randint(0,99)], 0.1, 20/iterations)
+        # network_event(agents[rnd.randint(0,99)], 1, 0.0001,j,1)
+        # network_down_event(agents[rnd.randint(0,99)], 0.1, 0.0005)
 
         for agent in agents:
             agent.update_dissatisfaction()
     print("\nFriends Average in the end: " + str(agents[0].close_friends_dissatisfaction()))
-    
+
 
     return dissatisfaction
 
@@ -373,7 +361,6 @@ def main():
 
     dissatisfaction = run_simulation(agents)
 
-
     # Print information about the first agent again after running the simulation
     # print_agent_information(agents[0])
     print(average_total_dissatisfaction(agents))
@@ -383,4 +370,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
