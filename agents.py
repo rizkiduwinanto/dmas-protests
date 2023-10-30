@@ -70,6 +70,7 @@ class Agent:
         return self.network
     
     def cap(self):
+        # cap currently not used outside BLM
         if self.affected_dissatisfaction>100:
             self.affected_dissatisfaction = 100
         if self.affected_dissatisfaction<0:
@@ -172,10 +173,6 @@ class Agent:
         affect_rate = 2
         # change =  self.dissatisfaction_distance() * math.exp((self.dissatisfaction_distance / 100)-1)
         change = self.dissatisfaction_distance() ** 3 / 100 ** 2
-        if change >0 :
-            change = change * 2 / 3
-        else:
-            change = change/3
         self.affected_dissatisfaction += change
 
         # Just to see:  give a 1/1000 possibility that one agent becomes wild, maximum dissatisfaction
