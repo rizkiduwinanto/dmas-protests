@@ -133,7 +133,7 @@ class Agent:
                                    CLOSE_FRIENDS_AF + FRIENDS_AF + NETWORK_AF)
         return weighted_average
 
-    def update_dissatisfaction(self):
+    def update_dissatisfaction(self, num=1):
         """
         Update the agent's affected dissatisfaction level based on their social interactions.
 
@@ -148,13 +148,21 @@ class Agent:
         change = self.dissatisfaction_distance() ** 3 / 100 ** 2
         self.affected_dissatisfaction += change
 
-        # Just to see:  give a 1/1000 possibility that one agent becomes wild, maximum dissatisfaction
+        # # Just to see:  give a 1/1000 possibility that one agent becomes wild, maximum dissatisfaction
         if rnd.randint(0, 100) <= 5:
             if self.affected_dissatisfaction != BASE_DISSATISFACTION:  # Note: 'BASE_DISSATISFACTION' is not defined in this code.
-                self.affected_dissatisfaction += (BASE_DISSATISFACTION - self.affected_dissatisfaction) / 10
+                self.affected_dissatisfaction += 1 / (num+1)
         if rnd.randint(0, 100) <= 3:
             if self.affected_dissatisfaction != 0:
-                self.affected_dissatisfaction -= self.affected_dissatisfaction / 10
+                self.affected_dissatisfaction -= 1 / (num+1)
+        
+        # Agents dissastifaction cannot be below 0
+        if self.affected_dissatisfaction < 0:
+            self.affected_dissatisfaction = 0 
+
+    def decreaseAgentDissatisfaction(self, num):
+        if self.affected_dissatisfaction > 0:
+            self.affected_dissatisfaction -= 1 / (num+1)
 
 
 def event(tick):
@@ -255,10 +263,9 @@ def run_simulation(agents):
     for j in range(iterations):
         dissatisfaction.append(average_total_dissatisfaction(agents))
 
-
         for agent in agents:
-            agent.update_dissatisfaction()
-
+            agent.update_dissatisfaction(j)
+            agent.decreaseAgentDissatisfaction(j)
     return dissatisfaction
 
 
