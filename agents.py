@@ -176,12 +176,19 @@ class Agent:
         self.affected_dissatisfaction += change
 
         # Just to see:  give a 1/1000 possibility that one agent becomes wild, maximum dissatisfaction
-        if rnd.randint(0, 100) <= 5:
-            if self.affected_dissatisfaction != BASE_DISSATISFACTION:  # Note: 'BASE_DISSATISFACTION' is not defined in this code.
-                self.affected_dissatisfaction += (BASE_DISSATISFACTION - self.affected_dissatisfaction) / 10
+        # if rnd.randint(0, 100) <= 5:
+        #     if self.affected_dissatisfaction != BASE_DISSATISFACTION:  # Note: 'BASE_DISSATISFACTION' is not defined in this code.
+        #         self.affected_dissatisfaction += (BASE_DISSATISFACTION - self.affected_dissatisfaction) / 10
         if rnd.randint(0, 100) <= 3:
             if self.affected_dissatisfaction != 0:
                 self.affected_dissatisfaction -= self.affected_dissatisfaction / 10
+            
+        if self.affected_dissatisfaction < 0:
+            self.affected_dissatisfaction = 0 
+    
+    def decreaseAgentDissatisfaction(self, iteration):
+        if self.affected_dissatisfaction > 0:
+            self.affected_dissatisfaction -= 1/(iteration+1) 
 
 
 def event(tick):
@@ -234,8 +241,10 @@ def BLM_simulation(agents):
         dissatisfaction.append(average_total_dissatisfaction(agents))
         for agent in agents:
             agent.update_dissatisfaction()
+            agent.decreaseAgentDissatisfaction(iterations)
 
     return dissatisfaction
+
 
 def BLM_even_list(tick):
     dissatisfaction = [0,0,0,0,0]
@@ -284,6 +293,11 @@ def BLM_even_list(tick):
     if tick>=2555: #2020-2023
          if 0 == rnd.randint(0,182): # court cases settlements about BLM deaths
             dissatisfaction = [-100,-100,-70,-10,-1]
+    
+    for i in range(len(dissatisfaction)):
+        if dissatisfaction[i] < 0:
+            dissatisfaction[i] = 0
+
     return dissatisfaction
 
 
