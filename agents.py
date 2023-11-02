@@ -5,6 +5,8 @@ import math
 
 # Global variables
 
+# Number of agents
+n_agents = 100
 # how much each connection is affected per person
 SELV = -30
 CLOSE_FRIENDS_AF = -10
@@ -20,7 +22,9 @@ NUMBER_OF_CLOSE_FRIENDS = 4
 NUMBER_OF_FRIENDS = 10
 NUMBER_OF_SOCIAL_NETWORK_FRIENDS = 30
 
-
+big_close_events = []
+big_acquaintance_events = []
+big_network_event = []
 class Agent:
     """Agent that interacts with agents in its network"""
 
@@ -311,6 +315,98 @@ def create_agents_0(amount):
         agents = np.append(agents, Agent(0, i))
     return agents
 
+def slow_decrease(agents):
+  for agent in agents:
+    agent.affected_dissatisfaction = agent.affected_dissatisfaction * 0.99
+
+def close_friends_event(agent, impact, probability,j,list):
+    if rnd.randint(0, int(1/probability)) == 1:
+        for a in agent.get_close_friends():
+            diff = 100 - a.get_affected_dissatisfaction()
+            a.event_update_affected_dissatisfaction(diff * impact)
+        if list == 1:
+            big_close_events.append(j)
+def acquaintances_event(agent, impact, probability,j,list):
+    if rnd.randint(0, int(1/probability)) == 1:
+        for a in agent.get_friends():
+            diff = 100 - a.get_affected_dissatisfaction()
+            a.event_update_affected_dissatisfaction(diff * impact)
+        if list == 1:
+            big_acquaintance_events.append(j)
+def acquaintances_down_event(agent, impact, probability):
+    if rnd.randint(0, int(1/probability)) == 1:
+        for a in agent.get_friends():
+            diff = a.get_affected_dissatisfaction()
+            a.event_update_affected_dissatisfaction(-diff * impact)
+def close_friends_down_event(agent, impact, probability):
+    if rnd.randint(0, int(1/probability)) == 1:
+        for a in agent.get_close_friends():
+            diff = a.get_affected_dissatisfaction()
+            a.event_update_affected_dissatisfaction(-impact * diff)
+def network_event(agent, impact, probability,j,list):
+    if rnd.randint(0, int(1/probability)) == 1:
+        for a in agent.get_network():
+            diff = 100 - a.get_affected_dissatisfaction()
+            a.event_update_affected_dissatisfaction(diff * impact)
+        if list == 1:
+            big_network_event.append(j)
+def network_down_event(agent, impact, probability):
+    if rnd.randint(0, int(1/probability)) == 1:
+        for a in agent.get_network():
+            diff = a.get_affected_dissatisfaction()
+            a.event_update_affected_dissatisfaction(-impact * diff)
+def global_event(agents, probability,diss):
+  if diss >= 80:
+    if rnd.randint(0, int(1/probability)) == 1:
+      for agent in agents:
+        agent.affected_dissatisfaction *= 0.8
+
+
+
+def distribute_event(agents, dissatisfaction, scope, probability):
+
+  # if rnd.randint(0, int(1/probability)) == 1:
+  if probability == 5000:
+    # if scope == 0:
+    #   r_list = []
+    #   for n in range(10):
+    #     r_list.append(rnd.randint(0, n_agents - 1))
+    #   for i in r_list:
+    #     for nei in agents[i].get_close_friends():
+    #       if nei.affected_dissatisfaction + (dissatisfaction / 30) <= 100:
+    #         nei.affected_dissatisfaction += dissatisfaction / 30
+    #       else:
+    #         nei.affected_dissatisfaction = 100
+    # if scope == 1:
+    #   r_list = []
+    #   for n in range(3):
+    #     r_list.append(rnd.randint(0, n_agents - 1))
+    #   for i in r_list:
+    #     for nei in agents[i].get_friends():
+    #       if nei.affected_dissatisfaction + dissatisfaction / 27 <= 100:
+    #         nei.affected_dissatisfaction += dissatisfaction / 27
+    #       else:
+    #         nei.affected_dissatisfaction = 100
+    # if scope == 2:
+    #   r_list = []
+    #   for n in range(1):
+    #     r_list.append(rnd.randint(0, n_agents - 1))
+    #   for i in r_list:
+    #     for nei in agents[i].get_network():
+    #       if nei.affected_dissatisfaction + dissatisfaction / 29 <= 100:
+    #         nei.affected_dissatisfaction += dissatisfaction / 29
+    #       else:
+    #         nei.affected_dissatisfaction = 100
+
+    r_list = []
+    for n in range(scope):
+      r_list.append(rnd.randint(0, n_agents - 1))
+    for i in r_list:
+      if agents[i].affected_dissatisfaction + dissatisfaction / scope <= 100:
+        agents[i].affected_dissatisfaction += dissatisfaction / scope
+      else:
+        agents[i].affected_dissatisfaction = 100
+
 def create_agents():
     """
     Create an array of Agent objects.
@@ -319,8 +415,8 @@ def create_agents():
     np.array: An array of Agent objects.
     """
     agents = np.array([])
-    for i in range(100):
-        agents = np.append(agents, Agent(rnd.randint(0, BASE_DISSATISFACTION), i))
+    for i in range(n_agents):
+        agents = np.append(agents, Agent(rnd.randint(0, 30), i))
     return agents
 
 
@@ -344,9 +440,9 @@ def create_friendships(agents):
     Args:
     agents (np.array): An array of Agent objects.
     """
-    for i in range(agents.size):
+    for i in range(n_agents):
         while len(agents[i].friends) != NUMBER_OF_FRIENDS:
-            current_agent = agents[rnd.randint(0, 9999)]
+            current_agent = agents[rnd.randint(0, n_agents - 1)]
             if not (np.any(agents[i].close_friends == current_agent)) and not (
             np.any(agents[i].friends == current_agent)):
                 agents[i].friends = np.append(agents[i].friends, current_agent)
@@ -359,9 +455,9 @@ def create_networks(agents):
     Args:
     agents (np.array): An array of Agent objects.
     """
-    for i in range(agents.size):
+    for i in range(n_agents):
         while len(agents[i].network) != NUMBER_OF_SOCIAL_NETWORK_FRIENDS:
-            current_agent = agents[rnd.randint(0, agents.size-1)]
+            current_agent = agents[rnd.randint(0, n_agents - 1)]
             if not (np.any(agents[i].close_friends == current_agent)) and not (
                     np.any(agents[i].friends == current_agent) and not (np.any(agents[i].network == current_agent))):
                 agents[i].network = np.append(agents[i].network, current_agent)
@@ -394,7 +490,9 @@ def run_simulation(agents):
     Returns:
     list: A list of dissatisfaction values for each iteration.
     """
-    iterations = 5000
+    iterations = 10000
+    # probability_close_event = 0.004
+
     dissatisfaction = []
 
     for j in range(iterations):
@@ -402,10 +500,42 @@ def run_simulation(agents):
             print(j/50,"%")
 
         dissatisfaction.append(average_total_dissatisfaction(agents))
+        # if j < iterations/2:
+        # close_friends_event(agents[rnd.randint(0,99)], 1, 20/iterations,j,0)
+        close_friends_event(agents[rnd.randint(0,n_agents - 1)], 0.3, 150/iterations,j,0)
+        # close_friends_event(agents[rnd.randint(0,n_agents - 1)], 1, 2/iterations,j,1)
+        # # close_friends_down_event(agents[rnd.randint(0,n_agents - 1)], 0.5, 150/iterations)
+        # close_friends_down_event(agents[rnd.randint(0,n_agents - 1)], 0.3, 150/iterations)
+        # # # close_friends_down_event(agents[rnd.randint(0,99)], 0.4,100/iterations)
+
+        acquaintances_event(agents[rnd.randint(0,n_agents - 1)], 0.3, 60/iterations,j,0)
+        acquaintances_event(agents[rnd.randint(0,n_agents - 1)], 1, 10/iterations,j,0)
+        # acquaintances_down_event(agents[rnd.randint(0,n_agents - 1)], 0.3,60/iterations)
+        # # # # acquaintances_event(agents[rnd.randint(0,99)], 1 ,75/iterations,j,0)
+
+        network_event(agents[rnd.randint(0,n_agents - 1)], 0.2, 10/iterations,j,0)
+        network_event(agents[rnd.randint(0,n_agents - 1)],0.8, 2/iterations,j,0)
+        # # # network_event(agents[rnd.randint(0,n_agents - 1)], 1, 1/i terations,j,0)
+        # network_down_event(agents[rnd.randint(0,n_agents - 1)], 0.2, 10/iterations)
+
+        # global_event(agents, 0.01,average_total_dissatisfaction(agents) )
+
+
+
+
+
+
+
+        # distribute_event(agents, 1000, 30, j)
 
         for agent in agents:
-            agent.update_dissatisfaction(j)
-            agent.decreaseAgentDissatisfaction(j)
+            agent.update_dissatisfaction()
+            if agent.affected_dissatisfaction - 0.04*j/iterations >= 0:
+              agent.affected_dissatisfaction -= 0.04*j/iterations
+        # slow_decrease(agents)
+    print("\nFriends Average in the end: " + str(agents[0].close_friends_dissatisfaction()))
+
+
     return dissatisfaction
 
 
@@ -431,8 +561,16 @@ def plot_dissatisfaction(dissatisfaction):
     :param dissatisfaction: An array containing the average dissatisfaction at each iteration.
     """
     plt.plot(dissatisfaction)
+    for x in big_close_events:
+        plt.axvline(x,color = "r", linestyle="dotted")
+    for x in big_acquaintance_events:
+        plt.axvline(x,color = "g", linestyle="dotted")
+    for x in big_network_event:
+        plt.axvline(x,color = "y", linestyle="dotted")
+    plt.axhline(50, color = "b", linestyle="dotted")
     plt.xlabel("Number of Iterations")
     plt.ylabel("Average Dissatisfaction")
+    plt.ylim(0,100)
     plt.show()
 
 
@@ -443,13 +581,13 @@ def main():
     create_networks(agents)
 
     # Print information about the first agent
-    print_agent_information(agents[0])
+    # print_agent_information(agents[0])
     print(average_total_dissatisfaction(agents))
 
     dissatisfaction = BLM_simulation(agents)
 
     # Print information about the first agent again after running the simulation
-    print_agent_information(agents[0])
+    # print_agent_information(agents[0])
     print(average_total_dissatisfaction(agents))
 
     plot_dissatisfaction(dissatisfaction)
@@ -457,3 +595,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+    main()
+    main()
+    main()
+    main()
+
