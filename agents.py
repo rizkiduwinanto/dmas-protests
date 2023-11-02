@@ -338,7 +338,7 @@ def create_friendships(agents):
     """
     for i in range(agents.size):
         while len(agents[i].friends) != NUMBER_OF_FRIENDS:
-            current_agent = agents[rnd.randint(0, 99)]
+            current_agent = agents[rnd.randint(0, 9999)]
             if not (np.any(agents[i].close_friends == current_agent)) and not (
             np.any(agents[i].friends == current_agent)):
                 agents[i].friends = np.append(agents[i].friends, current_agent)
@@ -430,7 +430,7 @@ def plot_dissatisfaction(dissatisfaction):
 
 
 def main():
-    agents = create_agents_0(1000)
+    agents = create_agents_0(10000)
     create_close_friendships(agents)
     create_friendships(agents)
     create_networks(agents)
